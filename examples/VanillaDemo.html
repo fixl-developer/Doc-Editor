@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Doc Editor — Vanilla JS demo</title>
+  <link rel="stylesheet" href="../dist/styles/doc-editor.css" />
+</head>
+<body>
+  <div id="toolbar"></div>
+  <div id="editor" style="min-height: 400px; max-width: 700px;"></div>
+
+  <script type="module">
+    import { DocEditor } from "../dist/index.js"
+
+    const root = document.getElementById("editor")
+    const editor = new DocEditor({
+      root,
+      content: "<p>Hello from the framework-agnostic core — no React required here.</p>",
+      placeholder: "Start typing...",
+      onChange: (html) => console.log("content changed:", html),
+    })
+
+    document.getElementById("toolbar").innerHTML = `
+      <button id="bold">Bold</button>
+      <button id="italic">Italic</button>
+      <button id="table">Insert Table</button>
+      <button id="undo">Undo</button>
+      <button id="redo">Redo</button>
+    `
+    document.getElementById("bold").onclick = () => editor.toggleBold()
+    document.getElementById("italic").onclick = () => editor.toggleItalic()
+    document.getElementById("table").onclick = () => editor.insertTable(3, 3)
+    document.getElementById("undo").onclick = () => editor.undo()
+    document.getElementById("redo").onclick = () => editor.redo()
+  </script>
+</body>
+</html>
