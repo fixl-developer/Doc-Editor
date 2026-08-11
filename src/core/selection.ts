@@ -60,7 +60,7 @@ export function closestWithin(
 export function getBlockElement(root: HTMLElement): HTMLElement | null {
   const range = getCurrentRange(root)
   if (!range) return null
-  const blockTags = new Set(["P", "H1", "H2", "H3", "LI", "BLOCKQUOTE", "DIV", "TD", "TH"])
+  const blockTags = new Set(["P", "H1", "H2", "H3", "H4", "H5", "H6", "LI", "BLOCKQUOTE", "DIV", "TD", "TH"])
   return closestWithin(range.startContainer, root, (el) => blockTags.has(el.tagName))
 }
 
@@ -121,6 +121,47 @@ export function setBlockTag(root: HTMLElement, tagName: string): void {
     const newRange = document.createRange()
     newRange.selectNodeContents(el)
     newRange.collapse(false)
+    sel.removeAllRanges()
+    sel.addRange(newRange)
+  }
+}
+
+/**
+ * Apply a single CSS property to the current selection by wrapping it in
+ * a <span style="prop: value">. If the selection's nearest ancestor span
+ * (created by this same helper) already carries that property, its value
+ * is updated in place instead of nesting another span.
+ */
+export function applyInlineStyle(root: HTMLElement, prop: string, value: string): void {
+  const range = getCurrentRange(root)
+  if (!range || range.collapsed) return
+
+  const existing = closestWithin(
+    range.commonAncestorContainer,
+    root,
+    (el) => el.tagName === "SPAN" && el.dataset.docEditorStyled === prop
+  )
+  if (existing) {
+    existing.style.setProperty(prop, value)
+    return
+  }
+
+  const wrapper = document.createElement("span")
+  wrapper.dataset.docEditorStyled = prop
+  wrapper.style.setProperty(prop, value)
+
+  try {
+    range.surroundContents(wrapper)
+  } catch {
+    const fragment = range.extractContents()
+    wrapper.appendChild(fragment)
+    range.insertNode(wrapper)
+  }
+
+  const sel = getSelection()
+  if (sel) {
+    const newRange = document.createRange()
+    newRange.selectNodeContents(wrapper)
     sel.removeAllRanges()
     sel.addRange(newRange)
   }

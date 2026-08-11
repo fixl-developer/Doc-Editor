@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react"
 import { DocEditor } from "../core/DocEditor.js"
-import type { ActiveState, DocEditorOptions } from "../core/types.js"
+import type { ActiveState, DocComment, DocEditorOptions, SlashState, TrackChangeAuthor } from "../core/types.js"
 
 export interface UseDocEditorArgs {
   content: string
   onChange: (html: string) => void
   placeholder?: string
   editable?: boolean
+  trackChanges?: boolean
+  author?: TrackChangeAuthor
 }
 
 const DEFAULT_STATE: ActiveState = {
@@ -16,19 +18,27 @@ const DEFAULT_STATE: ActiveState = {
   strike: false,
   code: false,
   highlight: false,
+  subscript: false,
+  superscript: false,
   heading: null,
   bulletList: false,
   orderedList: false,
+  taskList: false,
   blockquote: false,
   align: null,
   link: false,
+  fontFamily: null,
+  fontSize: null,
 }
 
 /** React hook that owns the lifecycle of a core DocEditor instance bound to a DOM node. */
-export function useDocEditor({ content, onChange, placeholder, editable }: UseDocEditorArgs) {
+export function useDocEditor({ content, onChange, placeholder, editable, trackChanges, author }: UseDocEditorArgs) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const editorRef = useRef<DocEditor | null>(null)
   const [activeState, setActiveState] = useState<ActiveState>(DEFAULT_STATE)
+  const [slashState, setSlashState] = useState<SlashState | null>(null)
+  const [comments, setComments] = useState<DocComment[]>([])
+  const [hasSelectedImage, setHasSelectedImage] = useState(false)
   const [ready, setReady] = useState(false)
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
@@ -41,8 +51,13 @@ export function useDocEditor({ content, onChange, placeholder, editable }: UseDo
       content,
       placeholder,
       editable,
+      trackChanges,
+      author,
       onChange: (html) => onChangeRef.current(html),
       onSelectionChange: (state) => setActiveState(state),
+      onSlashStateChange: (state) => setSlashState(state),
+      onCommentsChange: (list) => setComments(list),
+      onImageSelectionChange: (selected) => setHasSelectedImage(selected),
     }
 
     const editor = new DocEditor(options)
@@ -68,5 +83,5 @@ export function useDocEditor({ content, onChange, placeholder, editable }: UseDo
     }
   }, [content])
 
-  return { containerRef, editor: editorRef, activeState, ready }
+  return { containerRef, editor: editorRef, activeState, slashState, setSlashState, comments, hasSelectedImage, ready }
 }

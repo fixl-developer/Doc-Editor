@@ -40,13 +40,36 @@ export function printDocument({ title, subtitle, html }: PrintOptions): void {
       <head>
         <title>${escapeHtml(title ?? "Document")}</title>
         <style>
-          @page { margin: 24mm 18mm; }
-          body { font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #111; }
-          h1, h2, h3 { margin: 20px 0 10px; }
-          table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+          @page { margin: 24mm 18mm; counter-increment: page; }
+          html { counter-reset: page; }
+          body {
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            color: #111;
+            counter-reset: page;
+          }
+          h1, h2, h3, h4, h5, h6 { margin: 20px 0 10px; break-after: avoid; }
+          p { orphans: 3; widows: 3; }
+          table { border-collapse: collapse; width: 100%; margin: 10px 0; break-inside: auto; }
+          tr { break-inside: avoid; }
           td, th { border: 1px solid #ccc; padding: 8px; }
           img { max-width: 100%; }
           blockquote { border-left: 3px solid #ccc; margin: 12px 0; padding-left: 12px; color: #555; }
+          hr { border: none; border-top: 1px solid #ccc; margin: 16px 0; }
+          .doc-editor-codeblock { background: #f7f7f7; border: 1px solid #ddd; border-radius: 6px; padding: 12px; break-inside: avoid; }
+          .doc-editor-page-break { break-after: page; height: 0; border: none; margin: 0; }
+          .doc-editor-figure { break-inside: avoid; }
+          .doc-editor-comment { background: none !important; border-bottom: none !important; }
+          @media print {
+            .doc-page-footer {
+              position: fixed;
+              bottom: -18mm;
+              right: 0;
+              font-size: 10px;
+              color: #888;
+            }
+            .doc-page-footer::after { content: counter(page); }
+          }
         </style>
       </head>
       <body>
