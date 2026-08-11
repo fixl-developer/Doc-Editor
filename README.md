@@ -1,4 +1,4 @@
-# @fixl/doc-editor
+# @fixl-developer/doc-editor
 
 A rich-text document editor engine with zero editor/PDF/table/collab
 third-party dependencies, plus a thin React wrapper. Built for CRM/HRM
@@ -41,22 +41,27 @@ across other internal projects without pulling in Tiptap/Slate/Quill.
 - **Paste sanitizer**: hand-rolled tag/attribute whitelist walker
   (`src/core/sanitize.ts`) — no DOMPurify/sanitize-html.
 - The only runtime peer dependency is React itself, and only if you use
-  the `@fixl/doc-editor/react` entry point. The core (`@fixl/doc-editor`)
+  the `@fixl-developer/doc-editor/react` entry point. The core (`@fixl-developer/doc-editor`)
   has **zero runtime dependencies**.
 
-## Install (local package, not yet published)
+## Install
+
+```bash
+npm install @fixl-developer/doc-editor
+```
+
+For local development against this repo before it's published (or to test
+an unreleased change), point at the folder directly instead:
 
 ```bash
 npm install file:../Doc-Editor
-# or, once published to an internal registry:
-npm install @fixl/doc-editor
 ```
 
 ## Usage — React
 
 ```tsx
-import { DocEditor } from "@fixl/doc-editor/react"
-import "@fixl/doc-editor/styles.css"
+import { DocEditor } from "@fixl-developer/doc-editor/react"
+import "@fixl-developer/doc-editor/styles.css"
 
 function OfferLetterEditor() {
   const [content, setContent] = useState("<p>Dear {{candidateName}},</p>")
@@ -80,8 +85,8 @@ function OfferLetterEditor() {
 ## Usage — framework-agnostic core
 
 ```ts
-import { DocEditor } from "@fixl/doc-editor"
-import "@fixl/doc-editor/styles.css"
+import { DocEditor } from "@fixl-developer/doc-editor"
+import "@fixl-developer/doc-editor/styles.css"
 
 const editor = new DocEditor({
   root: document.getElementById("editor")!,
@@ -209,6 +214,30 @@ npm install
 npm run build      # tsc -> dist/, then copies styles.css
 npm run typecheck
 ```
+
+## Publishing (maintainers)
+
+The package is public on npm as `@fixl-developer/doc-editor`. To ship a
+new version:
+
+```bash
+npm login                        # once per machine, needs an npmjs.com account
+                                  # with publish rights on the @fixl-developer org/scope
+npm version patch                # or minor / major — bumps package.json + git tag
+npm run typecheck && npm run build
+npm publish --access public      # scoped packages default to private; this is required
+git push && git push --tags
+```
+
+`prepublishOnly` already re-runs typecheck + build before publish as a
+safety net. Check what will actually be included first with:
+
+```bash
+npm pack --dry-run
+```
+
+It should only list `dist/`, `server/collabServer.mjs`, `README.md`,
+`LICENSE`, and `package.json` — no `src/`, `examples/`, or `node_modules`.
 
 ## Known limitations (documented trade-offs, not hidden gaps)
 

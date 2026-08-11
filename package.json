@@ -1,9 +1,9 @@
 {
-  "name": "@fixl/doc-editor",
+  "name": "@fixl-developer/doc-editor",
   "version": "0.1.0",
-  "description": "Zero-dependency rich text document editor engine + React bindings, built on native contenteditable/Selection APIs. No editor libraries (no Tiptap/ProseMirror/Slate/Quill), no PDF/docx libraries.",
-  "license": "UNLICENSED",
-  "private": true,
+  "description": "Zero-dependency rich text document editor engine + React bindings, built on native contenteditable/Selection APIs. No editor libraries (no Tiptap/ProseMirror/Slate/Quill), no PDF/docx/collab libraries.",
+  "license": "MIT",
+  "private": false,
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,12 +19,38 @@
     "./styles.css": "./dist/styles/doc-editor.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "server",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/copy-css.mjs",
     "dev": "tsc -p tsconfig.json --watch",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run build"
+  },
+  "keywords": [
+    "rich-text-editor",
+    "wysiwyg",
+    "contenteditable",
+    "document-editor",
+    "react",
+    "zero-dependency",
+    "docx-export",
+    "collaborative-editing"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fixl-developer/Doc-Editor.git"
+  },
+  "homepage": "https://github.com/fixl-developer/Doc-Editor#readme",
+  "bugs": {
+    "url": "https://github.com/fixl-developer/Doc-Editor/issues"
+  },
+  "author": "fixl-developer",
+  "engines": {
+    "node": ">=18"
   },
   "peerDependencies": {
     "react": ">=18",
